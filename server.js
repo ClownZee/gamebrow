@@ -88,6 +88,31 @@ const scrapeCategoryGames = async (category, page = 1) => {
     }
 };
 
+const scrapeOnlineGames = async (page = 1) => {
+    try {
+        const url = `https://game3rb.com/category/games-online/page/${page}/`;
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
+        let games = [];
+
+        $('article.post-hentry').each((index, element) => {
+            const title = $(element).find('h3.entry-title a').text().trim();
+            const link = $(element).find('h3.entry-title a').attr('href');
+            const image = $(element).find('.entry-image').attr('src');
+            const categories = $(element).find('.entry-category').map((i, el) => $(el).text()).get();
+            const releaseDate = $(element).find('time.entry-date').attr('datetime');
+            const slug = link ? link.replace('https://game3rb.com/', '').replace(/\/$/, '') : '';
+            games.push({ title, slug, link, image, categories, releaseDate });
+        });
+        return games;
+    } catch (error) {
+        console.error(`Error fetching page ${page}:`, error.message);
+        return [];
+    }
+};
+
+
+
 
 // Fungsi untuk scraping detail game berdasarkan slug
 const scrapeGameDetails = async (gameSlug) => {
