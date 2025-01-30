@@ -111,6 +111,29 @@ const scrapeOnlineGames = async (page = 1) => {
     }
 };
 
+const UpdateGame = async (page = 1) => {
+    try {
+        const url = `https://game3rb.com/category/game-updates/page/${page}/`;
+        const { data } = await axios.get(url);
+        const $ = cheerio.load(data);
+        let games = [];
+
+        $('article.post-hentry').each((index, element) => {
+            const title = $(element).find('h3.entry-title a').text().trim();
+            const link = $(element).find('h3.entry-title a').attr('href');
+            const image = $(element).find('.entry-image').attr('src');
+            const categories = $(element).find('.entry-category').map((i, el) => $(el).text()).get();
+            const releaseDate = $(element).find('time.entry-date').attr('datetime');
+            const slug = link ? link.replace('https://game3rb.com/', '').replace(/\/$/, '') : '';
+            games.push({ title, slug, link, image, categories, releaseDate });
+        });
+        return games;
+    } catch (error) {
+        console.error(`Error fetching page ${page}:`, error.message);
+        return [];
+    }
+};
+
 
 
 
@@ -202,6 +225,10 @@ app.get('/category', async (req, res) => {
 
 app.get('/onlinegame', async (req, res) => {
     res.json(await scrapeOnlineGames(Number(req.query.page) || 1));
+});
+
+app.get('/updategame', async (req, res) => {
+    res.json(await UpdateGame(Number(req.query.page) || 1));
 });
 
 app.get('/games', async (req, res) => {
