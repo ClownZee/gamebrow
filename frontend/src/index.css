@@ -1,0 +1,14 @@
+/* Apply global dark background */
+body {
+  background-color: #121212; /* Dark background color */
+  color: #000000; /* Light text color for the whole body */
+}
+
+html {
+  height: 100%;
+}
+
+#root {
+  background-color: #121212; /* Dark background color */
+  height: 100%;
+}
